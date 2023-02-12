@@ -1,12 +1,18 @@
 const routes = () => ({
     home: {
         index: '/',
-        credits: '/credits',
+        credits: {
+            index: 'credits/',
+        },
+        oscars: {
+            index: 'oscars/:year/',
+        },
     },
 });
 
 export { default as Home } from '~routes/Home';
 export { default as Credits } from '~routes/Credits';
+export { default as Oscars } from '~routes/Oscars';
 
 export const getApiRoutes = () => ({
 });

@@ -9,7 +9,13 @@ $link-decoration: none;
 
 @import "~bootstrap/scss/variables";
 
-$theme-colors : map-merge($theme-colors, ('header-menu-bg': #EFEFEF, 'card-bg': #F8F8F8));
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "header-menu-bg": #efefef,
+    "card-bg": #f8f8f8,
+  )
+);
 
 @import "~bootstrap/scss/mixins/banner";
 @include bsBanner("");
@@ -56,3 +62,47 @@ $theme-colors : map-merge($theme-colors, ('header-menu-bg': #EFEFEF, 'card-bg': 
 // Utilities
 @import "~bootstrap/scss/utilities/api";
 
+.item-card {
+  .item-card-container {
+    .content {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      width: 100%;
+      svg, img {
+        width: 150px;
+        height: 226px;
+        object-fit: contain;
+      }
+      .description {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.footer {
+  position: fixed;
+  height: 50px;
+  bottom: 0;
+  width: 100%;
+  background-color: #efefef;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.cartouche {
+  position: relative;
+  p {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

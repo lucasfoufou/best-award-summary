@@ -24,5 +24,14 @@ export default defineConfig({
       clientPort: 443,
       port: 8030
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        fourofour: path.resolve(__dirname, '404.html'),
+      },
+    },
+  },
+  base: '/best-award-summary/',
 });

@@ -7,13 +7,14 @@ import { Container, Alert } from 'react-bootstrap';
 import App from '~src/App';
 import { getRoute } from '~utils/routes';
 import {
-  Home, Credits
+  Home, Credits, Oscars
 } from '~utils/routes';
 
 const router = createBrowserRouter([{
   path: getRoute('home'), element: <App />,
   children: [
     { index: true, element: <Home /> },
+    { path: getRoute('home.oscars'), element: <Oscars /> },
     { path: getRoute('home.credits'), element: <Credits /> },
     {
       path: '*', element:
@@ -25,7 +26,9 @@ const router = createBrowserRouter([{
         </Container>
     },
   ]
-}]);
+}], {
+  basename: '/best-award-summary',
+});
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <CookiesProvider>

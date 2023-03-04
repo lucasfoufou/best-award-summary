@@ -10,7 +10,7 @@ export default function OscarsFooter() {
     const { year } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const categories = oscars?.[year]?.map(e => e.name) ?? [];
+    const categories = ['Statistics', ...oscars?.[year]?.map(e => e.name) ?? []];
     const category = location.hash.replace('#', '') == '' ? categories[0] : location.hash.replace('#', '');
     const years = Object.keys(oscars).sort((a, b) => parseInt(a) - parseInt(b));
     const changeYear = (delta) => () => {

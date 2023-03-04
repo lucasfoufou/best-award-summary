@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { } from 'react-bootstrap';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 import { oscars } from '~utils/oscars';
 import { movies } from '~utils/movies';
@@ -15,7 +15,7 @@ export default function Oscars() {
     const category = location.hash.replace('#', '');
 
     const items = oscars?.[year] ?? [];
-    const categories = oscars?.[year]?.map(e => e.name) ?? [];
+    const categories = ['Statistics', ...oscars?.[year]?.map(e => e.name) ?? []];
 
     const illustrationMaker = (item, movies, people) => {
         if (item.mainType == 'movie') {
@@ -41,13 +41,101 @@ export default function Oscars() {
         }
     }, []);
 
+    const statistics = useMemo(() => {
+        const statistics = {};
+        items.filter(category => category.name == 'Awards').forEach(awards => {
+            awards.items[0]?.items.forEach(award => {
+                const movie = award.mainType == 'movie' ? award.main : award.secondary;
+                if (!statistics[movie]) {
+                    statistics[movie] = { awards: 0, nominations: 0 };
+                }
+                statistics[movie].awards++;
+            });
+        });
+        items.filter(category => category.name == 'Nominations').forEach(nominations => {
+            nominations.items.forEach(nomination => {
+                nomination.items.forEach(nominee => {
+                    const movie = nominee.mainType == 'movie' ? nominee.main : nominee.secondary;
+                    if (!statistics[movie]) {
+                        statistics[movie] = { awards: 0, nominations: 0 };
+                    }
+                    statistics[movie].nominations++;
+                });
+            });
+        });
+        return statistics;
+    }, [items]);
+
+    const getSecondary = (item) => {
+        if (item.secondaryType == 'movie') {
+            return movies[item.secondary]?.title;
+        } else if (item.secondaryType == 'people') {
+            if (typeof (item.secondary) == 'object') {
+                return item.secondary.map((secondary, index) =>
+                    <span key={index}>
+                        {people[secondary]?.name}{index + 1 < item.secondary.length ? <br /> : ''}
+                    </span>
+                );
+            } else {
+                return people[item.secondary]?.name;
+            }
+        }
+    };
+
     return <>
         <div className="container mb-5">
             <h1 className='text-uppercase text-center'>{`The ${year}${getOrdinal(year)} Academy Awards`}</h1>
             <Scrollspy scrollTargetIds={categories}>
+                <div id="Statistics" className='mb-5'>
+                    <h2 className='text-uppercase text-center text-md-start'>Statistics</h2>
+                    <div className="d-flex">
+                        <table className="table w-50 mx-2 align-self-start">
+                            <thead>
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>Awards</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    Object.keys(statistics)
+                                        ?.filter(index => statistics[index]?.awards > 1)
+                                        ?.sort((a, b) => statistics[b]?.awards - statistics[a]?.awards)
+                                        ?.map((movie, index) =>
+                                            <tr key={index}>
+                                                <td>{movies[movie]?.title}</td>
+                                                <td>{statistics[movie]?.awards}</td>
+                                            </tr>
+                                        )
+                                }
+                            </tbody>
+                        </table>
+                        <table className="table w-50 mx-2">
+                            <thead>
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>Nominations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    Object.keys(statistics)
+                                        .filter(index => statistics[index]?.nominations > 1)
+                                        .sort((a, b) => statistics[b]?.nominations - statistics[a]?.nominations)
+                                        .map((movie, index) =>
+                                            <tr key={index}>
+                                                <td>{movies[movie]?.title}</td>
+                                                <td>{statistics[movie]?.nominations}</td>
+                                            </tr>
+                                        )
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 {items.map((category, index) =>
                     <div key={index} id={category.name}>
-                        {index > 0 && <hr />}
+                        <hr />
                         <h2 className='text-uppercase text-center text-md-start'>{category.name}</h2>
                         {category.items.map((subcategory, subIndex) =>
                             <div key={subIndex}>
@@ -63,7 +151,7 @@ export default function Oscars() {
                                                     {illustrationMaker(item, movies, people)}
                                                     <div className="description">
                                                         <h5>{item.mainType == 'movie' ? movies[item.main]?.title : people[item.main]?.name}</h5>
-                                                        <p>{item.secondaryType == 'movie' ? movies[item.secondary]?.title : people[item.secondary]?.name}</p>
+                                                        <p>{getSecondary(item)}</p>
                                                         <p>{item.mainType == 'movie' ? movies[item.main]?.release_date : movies[item.secondary]?.release_date}</p>
                                                     </div>
                                                 </div>

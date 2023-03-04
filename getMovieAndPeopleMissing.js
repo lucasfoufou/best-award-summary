@@ -17,13 +17,23 @@ for (const key in oscars) {
             const items = oscarCategory[i]?.items;
             for (let i = 0; i < items.length; i++) {
                 const { main, mainType, secondary, secondaryType } = items[i];
-                [{ item: main, type: mainType }, { item: secondary, type: secondaryType }].forEach((item, index) => {
-                    if (item.type === 'movie') {
-                        moviesToDo.push(item.item);
-                    } else if (item.type === 'people') {
-                        peopleToDo.push(item.item);
+                if (mainType === 'movie') {
+                    moviesToDo.push(main);
+                } else if (mainType === 'people') {
+                    peopleToDo.push(main);
+                }
+
+                if (secondaryType === 'movie') {
+                    moviesToDo.push(secondary);
+                } else if (secondaryType === 'people') {
+                    if(!Array.isArray(secondary)) {
+                        peopleToDo.push(secondary);
+                    } else {
+                        secondary.forEach((people) => {
+                            peopleToDo.push(people);
+                        });
                     }
-                });
+                }
             }
         }
     }
@@ -32,7 +42,7 @@ for (const key in oscars) {
 console.log('Movies :');
 let tmpPromises = [];
 moviesToDo.forEach((movie) => {
-    if (currentMovies.includes(String(movie))) return;
+    if (currentMovies.includes(String(movie)) || !movie) return;
     currentMovies.push(String(movie));
     tmpPromises.push(new Promise(async (resolve) => {
         await getMovie(movie);
@@ -42,7 +52,7 @@ moviesToDo.forEach((movie) => {
 await Promise.all(tmpPromises);
 console.log('People :');
 peopleToDo.forEach((people) => {
-    if (currentPeople.includes(String(people))) return;
+    if (currentPeople.includes(String(people)) || !people) return;
     currentPeople.push(String(people));
     getPeople(people);
 });
